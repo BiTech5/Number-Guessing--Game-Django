@@ -1,8 +1,26 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
+import random
 from django.http import HttpResponse
-# Create your views here.
-from . import guess_game
+# View to start the game and set a random number in session
+def start_game(request):
+    request.session['number'] = random.randint(1, 10)
+    return redirect('home')
+
+# View to handle guessing
 def home(request):
-    nbr=guess_game.guess_fun(2)
-    print(nbr)
-    return render(request,'main.html',{'nbr':nbr})
+    number = (request.session.get('number'))
+    message = ''
+
+    if request.method == 'POST':
+
+        guess = int(request.POST.get('nbr'))
+        
+        if guess < number:
+            message = f'{guess} is too low! '
+        elif guess > number:
+            message = f'{guess} is too high! '
+        else:
+            message ='correct'
+    print(message)
+    return render(request, 'main.html', {'message': message})
+
